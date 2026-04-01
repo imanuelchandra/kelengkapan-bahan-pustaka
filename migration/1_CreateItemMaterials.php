@@ -25,6 +25,6 @@ class CreateItemMaterials extends Migration
 
     function down()
     {
-         Schema::drop('item_materials');
+         //Schema::drop('item_materials');
     }
 }

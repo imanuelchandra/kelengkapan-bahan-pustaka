@@ -29,8 +29,8 @@ class AddColumnForeignKeyItemMaterials extends Migration
     function down()
     {
 
-         Schema::table('item', function (Blueprint $table) {
-            $table->drop('item_material_id');    // Drops the column
-        });
+        //  Schema::table('item', function (Blueprint $table) {
+        //     $table->drop('item_material_id');    // Drops the column
+        // });
     }
 }
