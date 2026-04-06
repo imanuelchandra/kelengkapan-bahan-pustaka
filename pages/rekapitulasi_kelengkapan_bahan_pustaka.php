@@ -142,7 +142,7 @@ if (!$reportView) {
                     ?>
                 </div>
                 <div class="form-group divRow">
-                    <label><?php echo __('Tanggal Penjajaran'); ?></label>
+                    <label><?php echo __('Tanggal Kelengkapan'); ?></label>
                     <div class="divRowContent">
                         <div id="range">
                             <input type="text" name="tglMulaiPengatalogan">
@@ -195,7 +195,7 @@ if (!$reportView) {
     $reportgrid = new report_datagrid();
     $reportgrid->table_attr = 'class="s-table table table-sm table-bordered"';
     $reportgrid->setSQLColumn(
-        'DATE(i.last_update) AS \'' . __('Tanggal Penjajaran') . '\'',
+        'DATE(i.last_update) AS \'' . __('Tanggal Kelengkapan') . '\'',
         'b.title AS \'' . __('Judul') . '\'',
         'IF(COUNT(i.item_id)>0, COUNT(i.item_id), "<strong style=\"color: #f00;\">'. __('None') .'</strong>") AS \''.__('Eksemplar').'\'',
         'b.gmd AS \'' . __('GMD') . '\'',
@@ -203,28 +203,18 @@ if (!$reportView) {
         'b.isbn_issn AS \'' . __('ISBN/ISSN') . '\'',
         'b.author AS \'' . __('Pengarang') . '\'',
         'b.publisher AS \'' . __('Penerbit') . '\'',
-        'CASE WHEN imat.property_stamp = 0 THEN \'BELUM\' WHEN imat.property_stamp = 1 THEN \'SUDAH\' ELSE \'BELUM \' END AS \'' . __('Cap Kepemilikan') . '\'',
-        'CASE WHEN imat.inventory_stamp = 0 THEN \'BELUM\' WHEN imat.inventory_stamp >= 2 THEN \'SUDAH\' ELSE \'BELUM \' END AS \'' . __('Cap Inventaris') . '\'',
-        'CASE WHEN imat.barcode = 0 THEN \'Belum\' WHEN imat.barcode >= 3 THEN \'SUDAH\' ELSE \'BELUM \' END AS \'' . __('Barcode') . '\'',
-        'CASE WHEN imat.book_pocket = 0 THEN \'BELUM\' WHEN imat.book_pocket >= 4 THEN \'SUDAH\' ELSE \'BELUM \' END AS \'' . __('Kantong Buku') . '\'',
-        'CASE WHEN imat.book_card = 0 THEN \'BELUM\' WHEN imat.book_card >= 5 THEN \'SUDAH\' ELSE \'BELUM \' END AS \'' . __('Kartu Buku') . '\'',
-        'CASE WHEN imat.catalog_card = 0 THEN \'BELUM\' WHEN imat.catalog_card >= 6 THEN \'SUDAH\' ELSE \'BELUM \' END AS \'' . __('Kartu Katalog') . '\'',
-        'CASE WHEN imat.book_label = 0 THEN \'BELUM\' WHEN imat.book_label >= 7 THEN \'SUDAH\' ELSE \'BELUM \' END AS \'' . __('Label Buku') . '\'',
-        'CASE WHEN imat.date_due_slip = 0 THEN \'BELUM\' WHEN imat.date_due_slip >= 8 THEN \'SUDAH\' ELSE \'BELUM \' END AS \'' . __('Slip Pengembalian') . '\'',
+        'b.publish_year AS \'' . __('Tahun') . '\'',
+        'b.publish_place AS \'' . __('Kota') . '\'',
+        'ct.coll_type_name AS \'' . __('Tipe Koleksi') . '\'',
+        'b.classification AS \'' . __('Klasifikasi') . '\'',
+        'b.topic AS \'' . __('Subjek') . '\'',
+        'b.call_number  AS \'' . __('No Panggil') . '\'',
         'i.biblio_id'
     );
     $reportgrid->setSQLorder('b.title ASC');
 
     // is there any search
-    $criteria = 'b.biblio_id IS NOT NULL 
-                 AND imat.property_stamp IS NOT NULL AND imat.property_stamp != \'\' 
-                 OR imat.inventory_stamp IS NOT NULL AND imat.inventory_stamp != \'\'
-                 OR imat.barcode IS NOT NULL AND imat.barcode != \'\'
-                 OR imat.book_pocket IS NOT NULL AND imat.book_pocket != \'\'
-                 OR imat.book_card IS NOT NULL AND imat.book_card != \'\'
-                 OR imat.catalog_card IS NOT NULL AND imat.catalog_card != \'\'
-                 OR imat.book_label IS NOT NULL AND imat.book_label != \'\'
-                 OR imat.date_due_slip IS NOT NULL AND imat.date_due_slip != \'\' ';
+    $criteria = '(b.biblio_id IS NOT NULL AND imat.property_stamp IS NOT NULL AND imat.property_stamp != \'\') AND (b.biblio_id IS NOT NULL AND imat.barcode IS NOT NULL AND imat.barcode != \'\') ';
     //$criteria .= 'AND ba.author_id IN (SELECT DISTINCT author_id FROM mst_author) AND ba.biblio_id=i.biblio_id';
     if (isset($_GET['judul']) and !empty($_GET['judul'])) {
         $keyword = $dbs->escape_string(trim($_GET['judul']));
@@ -324,7 +314,7 @@ if (!$reportView) {
     // modify column value
     //$reportgrid->modifyColumnContent(1, 'callback{showTitleAuthors}');
     //$reportgrid->modifyColumnContent(3, 'callback{showStatus}');
-    $reportgrid->invisible_fields = array(16);
+    $reportgrid->invisible_fields = array(14);
 
     // show spreadsheet export button
     $reportgrid->show_spreadsheet_export = true;
@@ -337,7 +327,7 @@ if (!$reportView) {
     echo 'parent.$(\'#pagingBox\').html(\'' . str_replace(array("\n", "\r", "\t"), '', $reportgrid->paging_set) . '\');' . "\n";
     echo '</script>';
 
-    $xlsquery = "SELECT DATE(i.last_update) AS '" . __('TANGGAL PENJAJARAN') . "',
+    $xlsquery = "SELECT DATE(i.last_update) AS '" . __('TANGGAL KELENGKAPAN') . "',
             b.title AS '" . __('JUDUL') . "',
             IF(COUNT(i.item_id)>0, COUNT(i.item_id), '" . __('None') . "') AS '" . __('EKSEMPLAR') . "',
             b.gmd AS '" . __('GMD') . "',

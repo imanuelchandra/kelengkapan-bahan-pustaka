@@ -150,7 +150,7 @@ if (!$reportView) {
                     ?>
                 </div>
                 <div class="form-group divRow">
-                    <label><?php echo __('Tanggal Penjajaran'); ?></label>
+                    <label><?php echo __('Tanggal Kelengkapan'); ?></label>
                     <div class="divRowContent">
                         <div id="range">
                             <input type="text" name="tglMulaiPenjajaran">
@@ -225,15 +225,7 @@ if (!$reportView) {
     $reportgrid->setSQLorder('b.title ASC');
 
     // is there any search
-    $criteria = 'b.biblio_id IS NOT NULL 
-                 AND imat.property_stamp IS NOT NULL AND imat.property_stamp != \'\' 
-                 OR imat.inventory_stamp IS NOT NULL AND imat.inventory_stamp != \'\'
-                 OR imat.barcode IS NOT NULL AND imat.barcode != \'\'
-                 OR imat.book_pocket IS NOT NULL AND imat.book_pocket != \'\'
-                 OR imat.book_card IS NOT NULL AND imat.book_card != \'\'
-                 OR imat.catalog_card IS NOT NULL AND imat.catalog_card != \'\'
-                 OR imat.book_label IS NOT NULL AND imat.book_label != \'\'
-                 OR imat.date_due_slip IS NOT NULL AND imat.date_due_slip != \'\' ';
+    $criteria = '(b.biblio_id IS NOT NULL AND imat.property_stamp IS NOT NULL AND imat.property_stamp != \'\') AND (b.biblio_id IS NOT NULL AND imat.barcode IS NOT NULL AND imat.barcode != \'\') ';
     //$criteria .= 'AND ba.author_id IN (SELECT DISTINCT author_id FROM mst_author) AND ba.biblio_id=i.biblio_id';
     if (isset($_GET['judul']) and !empty($_GET['judul'])) {
         $keyword = $dbs->escape_string(trim($_GET['judul']));
@@ -357,7 +349,7 @@ if (!$reportView) {
 
     $xlsquery = "SELECT i.item_code AS '" . __('KODE EKSEMPLAR') . "',
             i.inventory_code AS '" . __('KODE INVENTARIS') . "',
-            DATE(i.last_update) AS '" . __('TANGGAL PENJAJARAN') . "',
+            DATE(i.last_update) AS '" . __('TANGGAL KELENGKAPAN') . "',
             b.title AS '" . __('JUDUL') . "',
             b.gmd AS '" . __('GMD') . "',
             b.edition AS '" . __('EDISI') . "',
@@ -368,7 +360,14 @@ if (!$reportView) {
             b.publish_place AS '" . __('KOTA') . "',
             ct.coll_type_name AS '" . __('TIPE KOLEKSI') . "',
             b.call_number AS '" . __('NO PANGGIL') . "',
-            i.site AS '" . __('LOKASI RAK') . "' FROM " .
+            CASE WHEN imat.property_stamp = 0 THEN 'BELUM' WHEN imat.property_stamp = 1 THEN 'SUDAH' ELSE 'BELUM ' END AS '" . __('Cap Kepemilikan') . "',
+            CASE WHEN imat.inventory_stamp = 0 THEN 'BELUM' WHEN imat.inventory_stamp >= 2 THEN 'SUDAH' ELSE 'BELUM ' END AS '" . __('Cap Inventaris') . "',
+            CASE WHEN imat.barcode = 0 THEN 'Belum' WHEN imat.barcode >= 3 THEN 'SUDAH' ELSE 'BELUM ' END AS '" . __('Barcode') . "',
+            CASE WHEN imat.book_pocket = 0 THEN 'BELUM' WHEN imat.book_pocket >= 4 THEN 'SUDAH' ELSE 'BELUM ' END AS '" . __('Kantong Buku') . "',
+            CASE WHEN imat.book_card = 0 THEN 'BELUM' WHEN imat.book_card >= 5 THEN 'SUDAH' ELSE 'BELUM ' END AS '" . __('Kartu Buku') . "',
+            CASE WHEN imat.catalog_card = 0 THEN 'BELUM' WHEN imat.catalog_card >= 6 THEN 'SUDAH' ELSE 'BELUM ' END AS '" . __('Kartu Katalog') . "',
+            CASE WHEN imat.book_label = 0 THEN 'BELUM' WHEN imat.book_label >= 7 THEN 'SUDAH' ELSE 'BELUM ' END AS '" . __('Label Buku') . "',
+            CASE WHEN imat.date_due_slip = 0 THEN 'BELUM' WHEN imat.date_due_slip >= 8 THEN 'SUDAH' ELSE 'BELUM' END AS '" . __('Slip Pengembalian') . "' FROM " .
         $table_spec . " WHERE " . $criteria. "GROUP BY i.item_code";
     // echo $xlsquery;
     unset($_SESSION['xlsdata']);

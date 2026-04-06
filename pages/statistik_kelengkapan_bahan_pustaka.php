@@ -101,7 +101,6 @@ if (!$reportView) {
 	$xls_cc = 0;
     $row_class = 'alterCellPrinted';
 
-     $criteria = '(site IS NOT NULL AND site != \'\')';
      
     if (isset($_GET['tglMulaiPenjajaran']) AND !empty($_GET['tglMulaiPenjajaran']) && isset($_GET['tglSelesaiPenjajaran']) AND !empty($_GET['tglSelesaiPenjajaran'])) {
         $penjajaranDateStart = $dbs->escape_string(trim($_GET['tglMulaiPenjajaran']));
@@ -232,29 +231,32 @@ if (!$reportView) {
       $output .= '</tr>';
      
     
-//    $output .= '<tr class="table-warning">';
-//    $output .=  '<th>&nbsp;</th>';
-//    $output .=  '<th>&nbsp;</th>';
-//    $output .=  '<th>Total :</th>';
+   $output .= '<tr class="table-warning">';
+   $output .=  '<th>Total :</th>';
     
-//    $total_q = $dbs->query("
-//                                 SELECT DISTINCT COUNT(item_id) AS jumlah_item
-//                                 FROM
-//                                 (
-//                                     SELECT
-//                                     item_id, 
-//                                     site,
-//                                     last_update
-//                                     FROM 
-//                                         item
-//                                 ) AS itemrak
-//                                 WHERE $criteria ORDER BY site ASC;
-//                                 ");
-//    $total_d = $total_q->fetch_row();
-//    $output .=  '<th>'.$total_d[0].'</th>';
+   $total_q = $dbs->query("
+                            SELECT COALESCE(sub.prop, 0)  + COALESCE(sub.inv, 0)  + COALESCE(sub.bar, 0)  + COALESCE(sub.book, 0)  + COALESCE(sub.bcard, 0)  + COALESCE(sub.catcard, 0)  + COALESCE(sub.blabel, 0)  + COALESCE(sub.ddslip, 0)  AS total
+                            FROM
+                            (
+                                SELECT 
+                                CASE WHEN property_stamp IS NOT NULL AND property_stamp != '' THEN COUNT(property_stamp) END AS prop,  
+                                
+                                CASE WHEN inventory_stamp IS NOT NULL AND inventory_stamp != '' THEN COUNT(inventory_stamp) END AS inv,  
+                                
+                                CASE WHEN barcode IS NOT NULL AND barcode != '' THEN COUNT(barcode) END AS bar,  
+                                CASE WHEN book_pocket IS NOT NULL AND book_pocket != '' THEN COUNT(book_pocket) END AS book,  
+                                CASE WHEN book_card IS NOT NULL AND book_card != '' THEN COUNT(book_card) END AS bcard, 
+                                CASE WHEN catalog_card IS NOT NULL AND catalog_card != '' THEN COUNT(catalog_card) END AS catcard, 
+                                CASE WHEN book_label IS NOT NULL AND book_label != '' THEN COUNT(book_label) END AS blabel, 
+                                
+                                CASE WHEN date_due_slip IS NOT NULL AND date_due_slip != '' THEN COUNT(date_due_slip) END AS ddslip 
+                            FROM item_materials) AS sub
+                                ");
+   $total_d = $total_q->fetch_row();
+   $output .=  '<th>'.$total_d[0].'</th>';
 
-   $xlsrows[$xls_rc] = array(' ',' ','Total ',$total_d[0]);
-   $xls_rc++;
+//    $xlsrows[$xls_rc] = array(' ',' ','Total ',$total_d[0]);
+//    $xls_rc++;
 
    $output .= '</tr>';
 
