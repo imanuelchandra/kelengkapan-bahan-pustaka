@@ -71,11 +71,11 @@ if (!$reportView) {
             <input type="hidden" name="id" value="<?= $_GET['id']??'' ?>"/>
             <input type="hidden" name="mod" value="<?= $_GET['mod']??'' ?>"/>
       
-                        <label><?php echo __('Tanggal Penjajaran'); ?></label>
+                        <label><?php echo __('Tanggal Kelengkapan'); ?></label>
                         <div id="range">
-                            <input type="text" name="tglMulaiPenjajaran">
+                            <input type="text" name="tglMulaiKelengkapan">
                             <span><?= __('to') ?></span>
-                            <input type="text" name="tglSelesaiPenjajaran">
+                            <input type="text" name="tglSelesaiKelengkapan">
                         </div>
 
             <input type="submit" name="applyFilter" value="<?php echo __('Apply Filter'); ?>" class="btn btn-primary" />
@@ -102,10 +102,10 @@ if (!$reportView) {
     $row_class = 'alterCellPrinted';
 
      
-    if (isset($_GET['tglMulaiPenjajaran']) AND !empty($_GET['tglMulaiPenjajaran']) && isset($_GET['tglSelesaiPenjajaran']) AND !empty($_GET['tglSelesaiPenjajaran'])) {
-        $penjajaranDateStart = $dbs->escape_string(trim($_GET['tglMulaiPenjajaran']));
-        $penjajaranDateEnd = $dbs->escape_string(trim($_GET['tglSelesaiPenjajaran']));
-        $criteria .= ' AND (DATE(last_update) >= \'' . $penjajaranDateStart . '\' AND DATE(last_update) <= \'' . $penjajaranDateEnd . '\')';
+    if (isset($_GET['tglMulaiKelengkapan']) AND !empty($_GET['tglMulaiKelengkapan']) && isset($_GET['tglSelesaiKelengkapan']) AND !empty($_GET['tglSelesaiKelengkapan'])) {
+        $kelengkapanDateStart = $dbs->escape_string(trim($_GET['tglMulaiKelengkapan']));
+        $kelengkapanDateEnd = $dbs->escape_string(trim($_GET['tglSelesaiKelengkapan']));
+        $criteria .= ' AND (DATE(updated_at) >= \'' . $kelengkapanDateStart . '\' AND DATE(updated_at) <= \'' . $kelengkapanDateEnd . '\')';
     }
 
     $output = '<table border="1">';
@@ -129,7 +129,9 @@ if (!$reportView) {
                                 CASE WHEN book_label = 7 THEN COUNT(book_label) END AS eks_booklabel,
                                 CASE WHEN date_due_slip = 8 THEN COUNT(date_due_slip) END AS eks_datedueslip
                                 FROM item_materials 
-                                WHERE property_stamp = 1 OR inventory_stamp = 2 OR barcode = 3 OR book_pocket = 4 OR book_card = 5 OR catalog_card = 6 OR book_label = 7 OR date_due_slip = 8 
+                                WHERE 
+                                id IS NOT NULL
+                                $criteria
                                 GROUP BY property_stamp, inventory_stamp, barcode, book_pocket, book_card, catalog_card, book_label, date_due_slip;
                                 ");
 
@@ -250,7 +252,8 @@ if (!$reportView) {
                                 CASE WHEN book_label IS NOT NULL AND book_label != '' THEN COUNT(book_label) END AS blabel, 
                                 
                                 CASE WHEN date_due_slip IS NOT NULL AND date_due_slip != '' THEN COUNT(date_due_slip) END AS ddslip 
-                            FROM item_materials) AS sub
+                            FROM item_materials
+                            WHERE id IS NOT NULL $criteria) AS sub
                                 ");
    $total_d = $total_q->fetch_row();
    $output .=  '<th>'.$total_d[1].'</th>';
@@ -280,8 +283,9 @@ if (!$reportView) {
                                 CASE WHEN book_label IS NOT NULL AND book_label != '' THEN COUNT(book_label) END AS blabel, 
                                 
                                 CASE WHEN date_due_slip IS NOT NULL AND date_due_slip != '' THEN COUNT(date_due_slip) END AS ddslip 
-                            FROM item_materials) AS sub
-                                ");
+                            FROM item_materials
+                            WHERE id IS NOT NULL $criteria) AS sub
+                            ");
    $total_d = $total_q->fetch_row();
    $output .=  '<th>'.$total_d[0].'</th>';
 

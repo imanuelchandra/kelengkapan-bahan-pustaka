@@ -164,8 +164,43 @@ if (!$reportView) {
                     <?php echo simbio_form_element::textField('text', 'tahunTerbit', '', 'class="form-control col-1"'); ?>
                 </div>
 
+                <div class="form-group divRow">
+                    <label><?php echo __('Kelengkapan Bahan Pustaka'); ?></label>
+                <?php
+                    $item_material = new simbio_fe_checkbox();
+                    $item_material->element_name= 'itemMaterial';
+                    $item_material_q = $dbs->query('SELECT property_stamp, inventory_stamp, barcode, book_pocket, book_card, catalog_card, book_label, date_due_slip FROM item_materials WHERE id='.(integer)$rec_d['item_material_id']);
+                    $item_material_d = $item_material_q->fetch_array();
+                    $item_material_val = array(
+                                                    (integer)$item_material_d['property_stamp'], 
+                                                    (integer)$item_material_d['inventory_stamp'],
+                                                    (integer)$item_material_d['barcode'],
+                                                    (integer)$item_material_d['book_pocket'],
+                                                    (integer)$item_material_d['book_card'],
+                                                    (integer)$item_material_d['catalog_card'],
+                                                    (integer)$item_material_d['book_label'],
+                                                    (integer)$item_material_d['date_due_slip']
+                                                    );
+                    //print_r($item_material_val);
+                    
+                    $item_material->element_value= $item_material_val;
+                    $item_material->element_helptext= "Kelengkapan Bahan Pustaka.)";
+                    $item_material->element_options = array (
+                                                        array(1, "Property Stamp"),
+                                                        array(2, "Inventory Stamp"),
+                                                        array(3, "Barcode"),
+                                                        array(4, "Book Pocket"),
+                                                        array(5, "Book Card"),
+                                                        array(6, "Catalog Card"),
+                                                        array(7, "Book Label"),
+                                                        array(8, "Date Due Slip"),
+                                                        );
+                    echo $item_material->out();
+                    // $form->addAnything(__('Item Materials Checklist'), $str_input_item_material);
+              
+                ?>
+                </div>
 
-                
 
                 <div class="form-group divRow">
                     <label><?php echo __('Total setiap halaman'); ?></label>
@@ -294,6 +329,44 @@ if (!$reportView) {
         $penjajaranDateStart = $dbs->escape_string(trim($_GET['tglMulaiPenjajaran']));
         $penjajaranDateEnd = $dbs->escape_string(trim($_GET['tglSelesaiPenjajaran']));
         $criteria .= ' AND (DATE(i.last_update) >= \'' . $penjajaranDateStart . '\' AND DATE(i.last_update) <= \'' . $penjajaranDateEnd . '\')';
+    }
+    
+    if(isset($_GET['itemMaterial'])){
+           //print_r($_GET['itemMaterial']);
+        foreach ($_GET['itemMaterial'] as $value) {
+            if($value == 1){
+              $criteria .= ' AND imat.property_stamp IS NOT NULL AND imat.property_stamp != \'\'';
+              //$criteria .= ' AND imat.property_stamp ='.$value;
+            }
+            if($value == 2){
+              $criteria .= ' AND imat.inventory_stamp IS NOT NULL AND imat.inventory_stamp != \'\''; 
+               //$criteria .= ' AND imat.inventory_stamp ='.$value;
+            }
+            if($value == 3){
+               $criteria .= ' AND imat.barcode IS NOT NULL AND imat.barcode != \'\''; 
+               //$criteria .= ' AND imat.barcode ='.$value;
+            }
+            if($value == 4){
+              $criteria .= ' AND imat.book_pocket IS NOT NULL AND imat.book_pocket != \'\''; 
+              //$criteria .= ' AND imat.book_pocket ='.$value;
+            }
+            if($value == 5){
+              $criteria .= ' AND imat.book_card IS NOT NULL AND imat.book_card != \'\''; 
+              //$criteria .= ' AND imat.book_card ='.$value;
+            }
+            if($value == 6){
+              $criteria .= ' AND imat.catalog_card IS NOT NULL AND imat.catalog_card != \'\''; 
+              //$criteria .= ' AND imat.catalog_card ='.$value;
+            }
+            if($value == 7){
+              $criteria .= ' AND imat.book_label IS NOT NULL AND imat.book_label != \'\''; 
+              //$criteria .= ' AND imat.book_label ='.$value;
+            }
+            if($value == 8){
+              $criteria .= ' AND imat.date_due_slip IS NOT NULL AND imat.date_due_slip != \'\''; 
+              //$criteria .= ' AND imat.date_due_slip ='.$value;
+            }
+        }
     }
     if (isset($_GET['totalSetiapHalaman'])) {
         $recsEachPage = (int)$_GET['totalSetiapHalaman'];
