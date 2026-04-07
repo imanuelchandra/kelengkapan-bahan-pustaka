@@ -81,7 +81,7 @@ function httpQuery($query = [])
     return http_build_query(array_unique(array_merge($_GET, $query)));
 }
 
-$page_title = 'Laporan Rekapitulasi Katalogisasi';
+$page_title = 'Laporan Rekapitulasi Kelengkapan Bahan Pustaka';
 $reportView = false;
 $num_recs_show = 20;
 if (isset($_GET['reportView'])) {

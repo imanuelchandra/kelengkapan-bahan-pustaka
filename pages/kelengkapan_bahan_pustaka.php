@@ -81,7 +81,7 @@ function httpQuery($query = [])
     return http_build_query(array_unique(array_merge($_GET, $query)));
 }
 
-$page_title = 'Laporan Katalogisasi';
+$page_title = 'Laporan Kelengkapan Bahan Pustaka';
 $reportView = false;
 $num_recs_show = 20;
 if (isset($_GET['reportView'])) {
@@ -163,6 +163,10 @@ if (!$reportView) {
                     <label><?php echo __('Tahun Terbit'); ?></label>
                     <?php echo simbio_form_element::textField('text', 'tahunTerbit', '', 'class="form-control col-1"'); ?>
                 </div>
+
+
+                
+
                 <div class="form-group divRow">
                     <label><?php echo __('Total setiap halaman'); ?></label>
                     <input type="text" name="totalSetiapHalaman" size="3" class="form-control col-1" maxlength="3" value="<?php echo $num_recs_show; ?>" />

@@ -61,7 +61,7 @@ if (!$reportView) {
 ?>
     <!-- filter -->
     <div class="per_title">
-        <h2><?php echo __('Laporan Rekapitulasi Penjajaran'); ?></h2>
+        <h2><?php echo __('Laporan Statistik Kelengkapan Bahan Pustaka'); ?></h2>
     </div>
     <div class="infoBox">
         <?php echo __('Report Filter'); ?>
@@ -232,10 +232,40 @@ if (!$reportView) {
      
     
    $output .= '<tr class="table-warning">';
-   $output .=  '<th>Total :</th>';
+   $output .=  '<th>Total Kelengkapan :</th>';
     
    $total_q = $dbs->query("
-                            SELECT COALESCE(sub.prop, 0)  + COALESCE(sub.inv, 0)  + COALESCE(sub.bar, 0)  + COALESCE(sub.book, 0)  + COALESCE(sub.bcard, 0)  + COALESCE(sub.catcard, 0)  + COALESCE(sub.blabel, 0)  + COALESCE(sub.ddslip, 0)  AS total
+                            SELECT bar, COALESCE(sub.prop, 0)  + COALESCE(sub.inv, 0)  + COALESCE(sub.bar, 0)  + COALESCE(sub.book, 0)  + COALESCE(sub.bcard, 0)  + COALESCE(sub.catcard, 0)  + COALESCE(sub.blabel, 0)  + COALESCE(sub.ddslip, 0)  AS total
+                            FROM
+                            (
+                                SELECT 
+                                CASE WHEN property_stamp IS NOT NULL AND property_stamp != '' THEN COUNT(property_stamp) END AS prop,  
+                                
+                                CASE WHEN inventory_stamp IS NOT NULL AND inventory_stamp != '' THEN COUNT(inventory_stamp) END AS inv,  
+                                
+                                CASE WHEN barcode IS NOT NULL AND barcode != '' THEN COUNT(barcode) END AS bar,  
+                                CASE WHEN book_pocket IS NOT NULL AND book_pocket != '' THEN COUNT(book_pocket) END AS book,  
+                                CASE WHEN book_card IS NOT NULL AND book_card != '' THEN COUNT(book_card) END AS bcard, 
+                                CASE WHEN catalog_card IS NOT NULL AND catalog_card != '' THEN COUNT(catalog_card) END AS catcard, 
+                                CASE WHEN book_label IS NOT NULL AND book_label != '' THEN COUNT(book_label) END AS blabel, 
+                                
+                                CASE WHEN date_due_slip IS NOT NULL AND date_due_slip != '' THEN COUNT(date_due_slip) END AS ddslip 
+                            FROM item_materials) AS sub
+                                ");
+   $total_d = $total_q->fetch_row();
+   $output .=  '<th>'.$total_d[1].'</th>';
+
+//    $xlsrows[$xls_rc] = array(' ',' ','Total ',$total_d[0]);
+//    $xls_rc++;
+
+   $output .= '</tr>';
+
+
+   $output .= '<tr class="table-warning">';
+   $output .=  '<th>Total Eksemplar :</th>';
+    
+   $total_q = $dbs->query("
+                            SELECT bar, COALESCE(sub.prop, 0)  + COALESCE(sub.inv, 0)  + COALESCE(sub.bar, 0)  + COALESCE(sub.book, 0)  + COALESCE(sub.bcard, 0)  + COALESCE(sub.catcard, 0)  + COALESCE(sub.blabel, 0)  + COALESCE(sub.ddslip, 0)  AS total
                             FROM
                             (
                                 SELECT 
@@ -264,7 +294,7 @@ if (!$reportView) {
    $output .= '</table>';
 
     // print out
-    echo '<div class="mb-2">'.__('Rekapitulasi Penjajaran').' 
+    echo '<div class="mb-2">'.__('Statistik Kelengkapan Bahan Pustaka').' 
     <a href="#" class="s-btn btn btn-default printReport" onclick="window.print()">'.__('Print Current Page').'</a>
     <a href="' . AWB . 'modules/reporting/xlsoutput.php" class="s-btn btn btn-default">'.__('Export to spreadsheet format').'</a></div>'."\n";
     echo $output;
