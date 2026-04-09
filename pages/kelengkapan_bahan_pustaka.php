@@ -238,6 +238,12 @@ if (!$reportView) {
                    LEFT JOIN mst_item_status AS mis ON i.item_status_id=mis.item_status_id
                    LEFT JOIN item_materials AS imat ON i.item_material_id=imat.id';
 
+    $unchecklist = '<div class="d-flex justify-content-center align-items-center">
+        <input type="checkbox" value="" id="flexCheckDisabled" disabled>
+    </div>';
+    $checklist = '<div class="d-flex justify-content-center align-items-center">
+        <input type="checkbox" value="" id="flexCheckCheckedDisabled" checked disabled>
+    </div>';
     // create datagrid
     $reportgrid = new report_datagrid();
     $reportgrid->table_attr = 'class="s-table table table-sm table-bordered"';
@@ -251,14 +257,15 @@ if (!$reportView) {
         'b.isbn_issn AS \'' . __('ISBN/ISSN') . '\'',
         'b.author AS \'' . __('Pengarang') . '\'',
         'b.publisher AS \'' . __('Penerbit') . '\'',
-        'CASE WHEN imat.property_stamp = 0 THEN \'BELUM\' WHEN imat.property_stamp = 1 THEN \'SUDAH\' ELSE \'BELUM \' END AS \'' . __('Cap Kepemilikan') . '\'',
-        'CASE WHEN imat.inventory_stamp = 0 THEN \'BELUM\' WHEN imat.inventory_stamp >= 2 THEN \'SUDAH\' ELSE \'BELUM \' END AS \'' . __('Cap Inventaris') . '\'',
-        'CASE WHEN imat.barcode = 0 THEN \'Belum\' WHEN imat.barcode >= 3 THEN \'SUDAH\' ELSE \'BELUM \' END AS \'' . __('Barcode') . '\'',
-        'CASE WHEN imat.book_pocket = 0 THEN \'BELUM\' WHEN imat.book_pocket >= 4 THEN \'SUDAH\' ELSE \'BELUM \' END AS \'' . __('Kantong Buku') . '\'',
-        'CASE WHEN imat.book_card = 0 THEN \'BELUM\' WHEN imat.book_card >= 5 THEN \'SUDAH\' ELSE \'BELUM \' END AS \'' . __('Kartu Buku') . '\'',
-        'CASE WHEN imat.catalog_card = 0 THEN \'BELUM\' WHEN imat.catalog_card >= 6 THEN \'SUDAH\' ELSE \'BELUM \' END AS \'' . __('Kartu Katalog') . '\'',
-        'CASE WHEN imat.book_label = 0 THEN \'BELUM\' WHEN imat.book_label >= 7 THEN \'SUDAH\' ELSE \'BELUM \' END AS \'' . __('Label Buku') . '\'',
-        'CASE WHEN imat.date_due_slip = 0 THEN \'BELUM\' WHEN imat.date_due_slip >= 8 THEN \'SUDAH\' ELSE \'BELUM \' END AS \'' . __('Slip Pengembalian') . '\'',
+        //'CASE WHEN imat.property_stamp = 0 THEN \'BELUM\' WHEN imat.property_stamp = 1 THEN \'SUDAH\' ELSE \'BELUM \' END AS \'' . __('Cap Kepemilikan') . '\'',
+        'CASE WHEN imat.property_stamp = 0 THEN \''.htmlspecialchars_decode(htmlentities($unchecklist, ENT_QUOTES|ENT_SUBSTITUTE|ENT_DISALLOWED)).'\' WHEN imat.property_stamp = 1 THEN \''.htmlspecialchars_decode(htmlentities($checklist, ENT_QUOTES|ENT_SUBSTITUTE|ENT_DISALLOWED)).'\' ELSE \''.htmlspecialchars_decode(htmlentities($unchecklist, ENT_QUOTES|ENT_SUBSTITUTE|ENT_DISALLOWED)).' \' END AS \'' . __('Cap Kepemilikan') . '\'',
+        'CASE WHEN imat.inventory_stamp = 0 THEN \''.htmlspecialchars_decode(htmlentities($unchecklist, ENT_QUOTES|ENT_SUBSTITUTE|ENT_DISALLOWED)).'\' WHEN imat.inventory_stamp >= 2 THEN \''.htmlspecialchars_decode(htmlentities($checklist, ENT_QUOTES|ENT_SUBSTITUTE|ENT_DISALLOWED)).'\' ELSE \''.htmlspecialchars_decode(htmlentities($unchecklist, ENT_QUOTES|ENT_SUBSTITUTE|ENT_DISALLOWED)).' \' END AS \'' . __('Cap Inventaris') . '\'',
+        'CASE WHEN imat.barcode = 0 THEN \''.htmlspecialchars_decode(htmlentities($unchecklist, ENT_QUOTES|ENT_SUBSTITUTE|ENT_DISALLOWED)).'\' WHEN imat.barcode >= 3 THEN \''.htmlspecialchars_decode(htmlentities($checklist, ENT_QUOTES|ENT_SUBSTITUTE|ENT_DISALLOWED)).'\' ELSE \''.htmlspecialchars_decode(htmlentities($unchecklist, ENT_QUOTES|ENT_SUBSTITUTE|ENT_DISALLOWED)).' \' END AS \'' . __('Barcode') . '\'',
+        'CASE WHEN imat.book_pocket = 0 THEN \''.htmlspecialchars_decode(htmlentities($unchecklist, ENT_QUOTES|ENT_SUBSTITUTE|ENT_DISALLOWED)).'\' WHEN imat.book_pocket >= 4 THEN \''.htmlspecialchars_decode(htmlentities($checklist, ENT_QUOTES|ENT_SUBSTITUTE|ENT_DISALLOWED)).'\' ELSE \''.htmlspecialchars_decode(htmlentities($unchecklist, ENT_QUOTES|ENT_SUBSTITUTE|ENT_DISALLOWED)).' \' END AS \'' . __('Kantong Buku') . '\'',
+        'CASE WHEN imat.book_card = 0 THEN \''.htmlspecialchars_decode(htmlentities($unchecklist, ENT_QUOTES|ENT_SUBSTITUTE|ENT_DISALLOWED)).'\' WHEN imat.book_card >= 5 THEN \''.htmlspecialchars_decode(htmlentities($checklist, ENT_QUOTES|ENT_SUBSTITUTE|ENT_DISALLOWED)).'\' ELSE \''.htmlspecialchars_decode(htmlentities($unchecklist, ENT_QUOTES|ENT_SUBSTITUTE|ENT_DISALLOWED)).' \' END AS \'' . __('Kartu Buku') . '\'',
+        'CASE WHEN imat.catalog_card = 0 THEN \''.htmlspecialchars_decode(htmlentities($unchecklist, ENT_QUOTES|ENT_SUBSTITUTE|ENT_DISALLOWED)).'\' WHEN imat.catalog_card >= 6 THEN \''.htmlspecialchars_decode(htmlentities($checklist, ENT_QUOTES|ENT_SUBSTITUTE|ENT_DISALLOWED)).'\' ELSE \''.htmlspecialchars_decode(htmlentities($unchecklist, ENT_QUOTES|ENT_SUBSTITUTE|ENT_DISALLOWED)).'\' END AS \'' . __('Kartu Katalog') . '\'',
+        'CASE WHEN imat.book_label = 0 THEN \''.htmlspecialchars_decode(htmlentities($unchecklist, ENT_QUOTES|ENT_SUBSTITUTE|ENT_DISALLOWED)).'\' WHEN imat.book_label >= 7 THEN \'\' ELSE \''.htmlspecialchars_decode(htmlentities($unchecklist, ENT_QUOTES|ENT_SUBSTITUTE|ENT_DISALLOWED)).' \' END AS \'' . __('Label Buku') . '\'',
+        'CASE WHEN imat.date_due_slip = 0 THEN \''.htmlspecialchars_decode(htmlentities($unchecklist, ENT_QUOTES|ENT_SUBSTITUTE|ENT_DISALLOWED)).'\' WHEN imat.date_due_slip >= 8 THEN \''.htmlspecialchars_decode(htmlentities($checklist, ENT_QUOTES|ENT_SUBSTITUTE|ENT_DISALLOWED)).'\' ELSE \''.htmlspecialchars_decode(htmlentities($unchecklist, ENT_QUOTES|ENT_SUBSTITUTE|ENT_DISALLOWED)).' \' END AS \'' . __('Slip Pengembalian') . '\'',
         'i.biblio_id'
     );
     $reportgrid->setSQLorder('b.title ASC');
