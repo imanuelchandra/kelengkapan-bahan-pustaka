@@ -72,46 +72,31 @@ if (isset($_POST['saveData']) AND $can_read AND $can_write) {
 
         //print_r($_POST['itemMaterial']);
 
-        foreach ($_POST['itemMaterial'] as $value) {
-            if($value == 1){
-               $dataItemMaterial['property_stamp'] = $value;
-            }
-            if($value == 2){
-               $dataItemMaterial['inventory_stamp'] = $value;
-            }
-            if($value == 3){
-               $dataItemMaterial['barcode'] = $value;
-            }
-            if($value == 4){
-              $dataItemMaterial['book_pocket'] = $value;
-            }
-            if($value == 5){
-              $dataItemMaterial['book_card'] = $value;
-            }
-            if($value == 6){
-              $dataItemMaterial['catalog_card'] = $value;
-            }
-            if($value == 7){
-              $dataItemMaterial['book_label'] = $value;
-            }
-            if($value == 8){
-              $dataItemMaterial['date_due_slip'] = $value;
-            }
-        }
+        $dataItemMaterial = array();
 
-        // $dataItemMaterial['property_stamp'] = $_POST['itemMaterial'][0];
-        // $dataItemMaterial['inventory_stamp'] = $_POST['itemMaterial'][1];
-        // $dataItemMaterial['barcode'] = $_POST['itemMaterial'][2];
-        // $dataItemMaterial['book_pocket'] = $_POST['itemMaterial'][3];
-        // $dataItemMaterial['book_card'] = $_POST['itemMaterial'][4];
-        // $dataItemMaterial['catalog_card'] = $_POST['itemMaterial'][5];
-        // $dataItemMaterial['book_label'] = $_POST['itemMaterial'][6];
-        // $dataItemMaterial['date_due_slip'] = $_POST['itemMaterial'][7];
+        $dataItemMaterial['property_stamp'] = isset($_POST['property_stamp']) ? 1 : 0;
+        $dataItemMaterial['inventory_stamp'] = isset($_POST['inventory_stamp']) ? 2 : 0;
+        $dataItemMaterial['barcode'] = isset($_POST['barcode']) ? 3 : 0; 
+        $dataItemMaterial['book_pocket'] = isset($_POST['book_pocket']) ? 4 : 0;
+        $dataItemMaterial['book_card'] = isset($_POST['book_card']) ? 5 : 0;
+        $dataItemMaterial['catalog_card'] = isset($_POST['catalog_card']) ? 6 : 0;
+        $dataItemMaterial['book_label'] = isset($_POST['book_label']) ? 7 : 0;
+        $dataItemMaterial['date_due_slip'] = isset($_POST['date_due_slip']) ? 8 : 0;
+            
+       // print_r($dataItemMaterial);
+        
+        $physicalCondition = $_POST['physicalCondition'];
+        $physicalConditionInfo = $_POST['physicalConditioninfo'];
 
-        //print_r($_POST['updateRecordMaterialID']);
-
+        $dataItemConditions['physical_condition'] = $physicalCondition;
+        $dataItemConditions['physical_condition_info'] = $physicalConditionInfo;
+        
         if($_POST['updateRecordMaterialID'] <= 0){
             $insertItemMaterials = $sql_op->insert('item_materials', $dataItemMaterial);
+        } 
+
+        if ($_POST['updateRecordConditionID'] <= 0) {
+            $insertItemConditions = $sql_op->insert('item_conditions', $dataItemConditions);
         } 
         
        
@@ -139,7 +124,11 @@ if (isset($_POST['saveData']) AND $can_read AND $can_write) {
             $data['item_material_id'] = $sql_op->insert_id;
         } 
 
-        $data['physical_condition'] = trim($dbs->escape_string(strip_tags($_POST['physicalCondition'])));
+        if ($_POST['updateRecordConditionID'] <= 0) {
+            $data['item_condition_id'] = $sql_op->insert_id;
+        } 
+
+        //$data['physical_condition'] = trim($dbs->escape_string(strip_tags($_POST['physicalCondition'])));
 
         $data['source'] = $_POST['source'];
         $data['order_no'] = trim($dbs->escape_string(strip_tags($_POST['orderNo'])));
@@ -164,9 +153,18 @@ if (isset($_POST['saveData']) AND $can_read AND $can_write) {
             // filter update record ID
             $updateRecordID = (integer)$_POST['updateRecordID'];
             $updateRecordMaterialID = (integer)$_POST['updateRecordMaterialID']; 
+            $updateRecordConditionID = (integer)$_POST['updateRecordConditionID'];
             // update the data
 
-            $updateItemMaterials = $sql_op->update('item_materials', $dataItemMaterial, "id=".$updateRecordMaterialID);
+            if ($updateRecordMaterialID >= 0) {
+                $updateItemMaterials = $sql_op->update('item_materials', $dataItemMaterial, "id=".$updateRecordMaterialID);
+            }
+            
+            if ($updateRecordConditionID >= 0) { 
+                $updateItemConditions = $sql_op->update('item_conditions', $dataItemConditions, "id=".$updateRecordConditionID);
+            }
+
+            
             $update = $sql_op->update('item', $data, "item_id=".$updateRecordID);
 
             // if ($updateRecordMaterialID == 0) {
@@ -323,12 +321,16 @@ if (isset($_POST['detail']) OR (isset($_GET['action']) AND $_GET['action'] == 'd
         // record ID for delete process
         if (!$in_pop_up) {
             $itemMaterialId = (integer)$rec_d['item_material_id'];
+            $itemConditionId = (integer)$rec_d['item_condition_id'];
             $form->record_id = $itemID;
             $form->addHidden('updateRecordMaterialID', $itemMaterialId);
+            $form->addHidden('updateRecordConditionID', $itemConditionId);
         } else {
             $itemMaterialId = (integer)$rec_d['item_material_id'];
+            $itemConditionId = (integer)$rec_d['item_condition_id'];
             $form->addHidden('updateRecordID', $itemID);
             $form->addHidden('updateRecordMaterialID', $itemMaterialId);
+            $form->addHidden('updateRecordConditionID', $itemConditionId);
             $form->back_button = false;
         }
 
@@ -405,38 +407,84 @@ if (isset($_POST['detail']) OR (isset($_GET['action']) AND $_GET['action'] == 'd
         }
     $form->addSelectList('itemStatusID', __('Item Status'), $item_status_options, $rec_d['item_status_id']??'','style="width:40%" class="form-control"');
 
-    $item_material = new simbio_fe_checkbox();
-    $item_material->element_name= 'itemMaterial';
+    // $item_material = new simbio_fe_checkbox();
+    // $item_material->element_name= 'itemMaterial';
     $item_material_q = $dbs->query('SELECT property_stamp, inventory_stamp, barcode, book_pocket, book_card, catalog_card, book_label, date_due_slip FROM item_materials WHERE id='.(integer)$rec_d['item_material_id']);
     $item_material_d = $item_material_q->fetch_array();
-    $item_material_val = array(
-                                     (integer)$item_material_d['property_stamp'], 
-                                     (integer)$item_material_d['inventory_stamp'],
-                                     (integer)$item_material_d['barcode'],
-                                     (integer)$item_material_d['book_pocket'],
-                                     (integer)$item_material_d['book_card'],
-                                     (integer)$item_material_d['catalog_card'],
-                                     (integer)$item_material_d['book_label'],
-                                     (integer)$item_material_d['date_due_slip']
-                                     );
-       //print_r($item_material_val);
+    // $item_material_val = array(
+    //                                  (integer)$item_material_d['property_stamp'], 
+    //                                  (integer)$item_material_d['inventory_stamp'],
+    //                                  (integer)$item_material_d['barcode'],
+    //                                  (integer)$item_material_d['book_pocket'],
+    //                                  (integer)$item_material_d['book_card'],
+    //                                  (integer)$item_material_d['catalog_card'],
+    //                                  (integer)$item_material_d['book_label'],
+    //                                  (integer)$item_material_d['date_due_slip']
+    //                                  );
+    //    //print_r($item_material_val);
     
-    $item_material->element_value= $item_material_val;
-    $item_material->element_helptext= "Kelengkapan Bahan Pustaka.)";
-    $item_material->element_options = array (
-                                        array(1, "Property Stamp"),
-                                        array(2, "Inventory Stamp"),
-                                        array(3, "Barcode"),
-                                        array(4, "Book Pocket"),
-                                        array(5, "Book Card"),
-                                        array(6, "Catalog Card"),
-                                        array(7, "Book Label"),
-                                        array(8, "Date Due Slip"),
-                                        );
-    $str_input_item_material = $item_material->out();
+    // $item_material->element_value= $item_material_val;
+    // $item_material->element_helptext= "Kelengkapan Bahan Pustaka.)";
+    // $item_material->element_options = array (
+    //                                     array(1, "Property Stamp"),
+    //                                     array(2, "Inventory Stamp"),
+    //                                     array(3, "Barcode"),
+    //                                     array(4, "Book Pocket"),
+    //                                     array(5, "Book Card"),
+    //                                     array(6, "Catalog Card"),
+    //                                     array(7, "Book Label"),
+    //                                     array(8, "Date Due Slip"),
+    //                                     );
+    // $str_input_item_material = $item_material->out();
+    $str_input_item_material .='<div class="form-check">
+        <input class="form-check-input" type="checkbox" name="property_stamp" value="'.((integer)$item_material_d['property_stamp'] == 1 ? 1 : 0).'" id="property_stamp" '.((integer)$item_material_d['property_stamp'] == 1 ? "checked" : "") .'>
+        <label class="form-check-label" for="flexCheckDefault">Property Stamp</label>
+    </div>';
+
+    $str_input_item_material .='<div class="form-check">
+        <input class="form-check-input" type="checkbox" name="inventory_stamp" value="'.((integer)$item_material_d['inventory_stamp'] == 2 ? 2 : 0).'" id="inventory_stamp" '.((integer)$item_material_d['inventory_stamp'] == 2 ? "checked" : "") .'>
+        <label class="form-check-label" for="flexCheckDefault">Inventory Stamp</label>
+    </div>';
+
+    $str_input_item_material .='<div class="form-check">
+        <input class="form-check-input" type="checkbox" name="barcode" value="'.((integer)$item_material_d['barcode'] == 3 ? 3 : 0).'" id="barcode" '.((integer)$item_material_d['barcode'] == 3 ? "checked" : "") .'>
+        <label class="form-check-label" for="flexCheckDefault">Barcode</label>
+    </div>';
+
+    $str_input_item_material .='<div class="form-check">
+        <input class="form-check-input" type="checkbox" name="book_pocket" value="'.((integer)$item_material_d['book_pocket'] == 4 ? 4 : 0).'" id="book_pocket" '.((integer)$item_material_d['book_pocket'] == 4 ? "checked" : "") .'>
+        <label class="form-check-label" for="flexCheckDefault">Book Pocket</label>
+    </div>';
+
+    $str_input_item_material .='<div class="form-check">
+        <input class="form-check-input" type="checkbox" name="book_card" value="'.((integer)$item_material_d['book_card'] == 5 ? 5 : 0).'" id="book_card" '.((integer)$item_material_d['book_card'] == 5 ? "checked" : "") .'>
+        <label class="form-check-label" for="flexCheckDefault">Book Card</label>
+    </div>';
+
+    $str_input_item_material .='<div class="form-check">
+        <input class="form-check-input" type="checkbox" name="catalog_card" value="'.((integer)$item_material_d['catalog_card'] == 6 ? 6 : 0).'" id="catalog_card" '.((integer)$item_material_d['catalog_card'] == 6 ? "checked" : "") .'>
+        <label class="form-check-label" for="flexCheckDefault">Catalog Card</label>
+    </div>';
+
+    $str_input_item_material .='<div class="form-check">
+        <input class="form-check-input" type="checkbox" name="book_label" value="'.((integer)$item_material_d['book_label'] == 7 ? 7 : 0).'" id="book_label" '.((integer)$item_material_d['book_label'] == 7 ? "checked" : "") .'>
+        <label class="form-check-label" for="flexCheckDefault">Book Label</label>
+    </div>';
+
+    $str_input_item_material .='<div class="form-check">
+        <input class="form-check-input" type="checkbox" name="date_due_slip" value="'.((integer)$item_material_d['date_due_slip'] == 8 ? 8 : 0).'" id="date_due_slip" '.((integer)$item_material_d['date_due_slip'] == 8 ? "checked" : "") .'>
+        <label class="form-check-label" for="flexCheckDefault">Date Due Slip</label>
+    </div>';
+
     $form->addAnything(__('Item Materials Checklist'), $str_input_item_material);
 
-    $form->addTextField('textarea', 'physicalCondition', __('Physical Condition'), $rec_d['physical_condition']??'', 'style="width: 40%;" class="form-control"');
+    $physicalc_options[] = array('1', __('Baik'));
+    $physicalc_options[] = array('2', __('Rusak Ringan'));
+    $physicalc_options[] = array('3', __('Rusak Berat'));
+    $item_condition_q = $dbs->query('SELECT physical_condition, physical_condition_info FROM item_conditions WHERE id='.(integer)$rec_d['item_condition_id']);
+    $item_condition_d = $item_condition_q->fetch_array();
+    $form->addRadio('physicalCondition', __('Physical Condition'), $physicalc_options, empty($item_condition_d['physical_condition'])?'1':$item_condition_d['physical_condition']);
+    $form->addTextField('textarea', 'physicalConditioninfo', __('Physical Condition Info'), $item_condition_d['physical_condition_info']??'', 'style="width: 40%;" class="form-control"');
 
     // order number
     $form->addTextField('text', 'orderNo', __('Order Number'), $rec_d['order_no']??'', 'style="width: 40%;" class="form-control"');

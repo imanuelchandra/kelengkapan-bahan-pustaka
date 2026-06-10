@@ -120,19 +120,18 @@ if (!$reportView) {
      $output .= '<tbody>';
      $itemMaterials_q = $dbs->query("
                                 SELECT 
-                                CASE WHEN property_stamp = 1 THEN COUNT(property_stamp) END AS eks_propstamp, 
-                                CASE WHEN inventory_stamp = 2 THEN COUNT(inventory_stamp) END AS eks_invstamp,
-                                CASE WHEN barcode = 3 THEN COUNT(barcode) END AS eks_barcode,
-                                CASE WHEN book_pocket = 4 THEN COUNT(book_pocket) END AS eks_bookpocket,
-                                CASE WHEN book_card = 5 THEN COUNT(book_card) END AS eks_bookcard,
-                                CASE WHEN catalog_card = 6 THEN COUNT(catalog_card) END AS eks_catcard,
-                                CASE WHEN book_label = 7 THEN COUNT(book_label) END AS eks_booklabel,
-                                CASE WHEN date_due_slip = 8 THEN COUNT(date_due_slip) END AS eks_datedueslip
+                                SUM(CASE WHEN property_stamp = 1 THEN 1 ELSE 0 END) AS eks_propstamp, 
+                                SUM(CASE WHEN inventory_stamp = 2 THEN 1 ELSE 0 END) AS eks_invstamp,
+                                SUM(CASE WHEN barcode = 3 THEN 1 ELSE 0 END) AS eks_barcode,
+                                SUM(CASE WHEN book_pocket = 4 THEN 1 ELSE 0 END) AS eks_bookpocket,
+                                SUM(CASE WHEN book_card = 5 THEN 1 ELSE 0 END) AS eks_bookcard,
+                                SUM(CASE WHEN catalog_card = 6 THEN 1 ELSE 0 END) AS eks_catcard,
+                                SUM(CASE WHEN book_label = 7 THEN 1 ELSE 0 END) AS eks_booklabel,
+                                SUM(CASE WHEN date_due_slip = 8 THEN 1 ELSE 0 END) AS eks_datedueslip
                                 FROM item_materials 
                                 WHERE 
                                 id IS NOT NULL
-                                $criteria
-                                GROUP BY property_stamp, inventory_stamp, barcode, book_pocket, book_card, catalog_card, book_label, date_due_slip;
+                                $criteria;
                                 ");
 
       $itemMaterials_d = $itemMaterials_q->fetch_array();
@@ -237,26 +236,23 @@ if (!$reportView) {
    $output .=  '<th>Total Kelengkapan :</th>';
     
    $total_q = $dbs->query("
-                            SELECT bar, COALESCE(sub.prop, 0)  + COALESCE(sub.inv, 0)  + COALESCE(sub.bar, 0)  + COALESCE(sub.book, 0)  + COALESCE(sub.bcard, 0)  + COALESCE(sub.catcard, 0)  + COALESCE(sub.blabel, 0)  + COALESCE(sub.ddslip, 0)  AS total
+                            SELECT COALESCE(sub.prop, 0) + COALESCE(sub.inv, 0) + COALESCE(sub.bar, 0) + COALESCE(sub.book, 0) + COALESCE(sub.bcard, 0) + COALESCE(sub.catcard, 0) + COALESCE(sub.blabel, 0) + COALESCE(sub.ddslip, 0)  AS total
                             FROM
                             (
                                 SELECT 
-                                CASE WHEN property_stamp IS NOT NULL AND property_stamp != '' THEN COUNT(property_stamp) END AS prop,  
-                                
-                                CASE WHEN inventory_stamp IS NOT NULL AND inventory_stamp != '' THEN COUNT(inventory_stamp) END AS inv,  
-                                
-                                CASE WHEN barcode IS NOT NULL AND barcode != '' THEN COUNT(barcode) END AS bar,  
-                                CASE WHEN book_pocket IS NOT NULL AND book_pocket != '' THEN COUNT(book_pocket) END AS book,  
-                                CASE WHEN book_card IS NOT NULL AND book_card != '' THEN COUNT(book_card) END AS bcard, 
-                                CASE WHEN catalog_card IS NOT NULL AND catalog_card != '' THEN COUNT(catalog_card) END AS catcard, 
-                                CASE WHEN book_label IS NOT NULL AND book_label != '' THEN COUNT(book_label) END AS blabel, 
-                                
-                                CASE WHEN date_due_slip IS NOT NULL AND date_due_slip != '' THEN COUNT(date_due_slip) END AS ddslip 
+                                SUM(CASE WHEN property_stamp = 1 THEN 1 ELSE 0 END) AS prop,  
+                                SUM(CASE WHEN inventory_stamp = 2 THEN 1 ELSE 0 END) AS inv,  
+                                SUM(CASE WHEN barcode = 3 THEN 1 ELSE 0 END) AS bar,  
+                                SUM(CASE WHEN book_pocket = 4 THEN 1 ELSE 0 END) AS book,  
+                                SUM(CASE WHEN book_card = 5 THEN 1 ELSE 0 END) AS bcard, 
+                                SUM(CASE WHEN catalog_card = 6 THEN 1 ELSE 0 END) AS catcard, 
+                                SUM(CASE WHEN book_label = 7 THEN 1 ELSE 0 END) AS blabel, 
+                                SUM(CASE WHEN date_due_slip = 8 THEN 1 ELSE 0 END) AS ddslip 
                             FROM item_materials
                             WHERE id IS NOT NULL $criteria) AS sub
                                 ");
    $total_d = $total_q->fetch_row();
-   $output .=  '<th>'.$total_d[1].'</th>';
+   $output .=  '<th>'.$total_d[0].'</th>';
 
 //    $xlsrows[$xls_rc] = array(' ',' ','Total ',$total_d[0]);
 //    $xls_rc++;
@@ -268,23 +264,9 @@ if (!$reportView) {
    $output .=  '<th>Total Eksemplar :</th>';
     
    $total_q = $dbs->query("
-                            SELECT bar, COALESCE(sub.prop, 0)  + COALESCE(sub.inv, 0)  + COALESCE(sub.bar, 0)  + COALESCE(sub.book, 0)  + COALESCE(sub.bcard, 0)  + COALESCE(sub.catcard, 0)  + COALESCE(sub.blabel, 0)  + COALESCE(sub.ddslip, 0)  AS total
-                            FROM
-                            (
-                                SELECT 
-                                CASE WHEN property_stamp IS NOT NULL AND property_stamp != '' THEN COUNT(property_stamp) END AS prop,  
-                                
-                                CASE WHEN inventory_stamp IS NOT NULL AND inventory_stamp != '' THEN COUNT(inventory_stamp) END AS inv,  
-                                
-                                CASE WHEN barcode IS NOT NULL AND barcode != '' THEN COUNT(barcode) END AS bar,  
-                                CASE WHEN book_pocket IS NOT NULL AND book_pocket != '' THEN COUNT(book_pocket) END AS book,  
-                                CASE WHEN book_card IS NOT NULL AND book_card != '' THEN COUNT(book_card) END AS bcard, 
-                                CASE WHEN catalog_card IS NOT NULL AND catalog_card != '' THEN COUNT(catalog_card) END AS catcard, 
-                                CASE WHEN book_label IS NOT NULL AND book_label != '' THEN COUNT(book_label) END AS blabel, 
-                                
-                                CASE WHEN date_due_slip IS NOT NULL AND date_due_slip != '' THEN COUNT(date_due_slip) END AS ddslip 
+                            SELECT COUNT(id) AS total
                             FROM item_materials
-                            WHERE id IS NOT NULL $criteria) AS sub
+                            WHERE id IS NOT NULL $criteria
                             ");
    $total_d = $total_q->fetch_row();
    $output .=  '<th>'.$total_d[0].'</th>';
