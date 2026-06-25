@@ -74,14 +74,7 @@ if (isset($_POST['saveData']) AND $can_read AND $can_write) {
 
         $dataItemMaterial = array();
 
-        $dataItemMaterial['property_stamp'] = isset($_POST['property_stamp']) ? 1 : 0;
-        $dataItemMaterial['inventory_stamp'] = isset($_POST['inventory_stamp']) ? 2 : 0;
-        $dataItemMaterial['barcode'] = isset($_POST['barcode']) ? 3 : 0; 
-        $dataItemMaterial['book_pocket'] = isset($_POST['book_pocket']) ? 4 : 0;
-        $dataItemMaterial['book_card'] = isset($_POST['book_card']) ? 5 : 0;
-        $dataItemMaterial['catalog_card'] = isset($_POST['catalog_card']) ? 6 : 0;
-        $dataItemMaterial['book_label'] = isset($_POST['book_label']) ? 7 : 0;
-        $dataItemMaterial['date_due_slip'] = isset($_POST['date_due_slip']) ? 8 : 0;
+       
             
        // print_r($dataItemMaterial);
         
@@ -92,11 +85,46 @@ if (isset($_POST['saveData']) AND $can_read AND $can_write) {
         $dataItemConditions['physical_condition_info'] = $physicalConditionInfo;
         
         if($_POST['updateRecordMaterialID'] <= 0){
-            $insertItemMaterials = $sql_op->insert('item_materials', $dataItemMaterial);
+      
+            if(isset($_POST['property_stamp']) || 
+               isset($_POST['inventory_stamp']) || 
+               isset($_POST['barcode']) || 
+               isset($_POST['book_pocket']) || 
+               isset($_POST['book_card']) || 
+               isset($_POST['catalog_card']) || 
+               isset($_POST['book_label']) ||
+               isset($_POST['date_due_slip'])
+                ){
+
+                // $dataItemMaterial['property_stamp'] = 1;
+                // $dataItemMaterial['inventory_stamp'] = 2;
+                // $dataItemMaterial['barcode'] = 3; 
+                // $dataItemMaterial['book_pocket'] = 4;
+                // $dataItemMaterial['book_card'] = 5;
+                // $dataItemMaterial['catalog_card'] = 6;
+                // $dataItemMaterial['book_label'] = 7;
+                // $dataItemMaterial['date_due_slip'] = 8;
+
+
+                $dataItemMaterial['property_stamp'] = isset($_POST['property_stamp']) ? 1 : NULL;
+                $dataItemMaterial['inventory_stamp'] = isset($_POST['inventory_stamp']) ? 2 : NULL;
+                $dataItemMaterial['barcode'] = isset($_POST['barcode']) ? 3 : NULL; 
+                $dataItemMaterial['book_pocket'] = isset($_POST['book_pocket']) ? 4 : NULL;
+                $dataItemMaterial['book_card'] = isset($_POST['book_card']) ? 5 : NULL;
+                $dataItemMaterial['catalog_card'] = isset($_POST['catalog_card']) ? 6 : NULL;
+                $dataItemMaterial['book_label'] = isset($_POST['book_label']) ? 7 : NULL;
+                $dataItemMaterial['date_due_slip'] = isset($_POST['date_due_slip']) ? 8 : NULL;
+
+                $insertItemMaterials = $sql_op->insert('item_materials', $dataItemMaterial);
+
+                $data['item_material_id'] = $sql_op->insert_id;
+            } 
+
         } 
 
         if ($_POST['updateRecordConditionID'] <= 0) {
             $insertItemConditions = $sql_op->insert('item_conditions', $dataItemConditions);
+            $data['item_condition_id'] = $sql_op->insert_id;
         } 
         
        
@@ -120,13 +148,13 @@ if (isset($_POST['saveData']) AND $can_read AND $can_write) {
 
      
 
-        if($_POST['updateRecordMaterialID'] <= 0){
-            $data['item_material_id'] = $sql_op->insert_id;
-        } 
+        // if($_POST['updateRecordMaterialID'] <= 0){
+          
+        // } 
 
-        if ($_POST['updateRecordConditionID'] <= 0) {
-            $data['item_condition_id'] = $sql_op->insert_id;
-        } 
+        // if ($_POST['updateRecordConditionID'] <= 0) {
+            
+        // } 
 
         //$data['physical_condition'] = trim($dbs->escape_string(strip_tags($_POST['physicalCondition'])));
 
@@ -157,6 +185,16 @@ if (isset($_POST['saveData']) AND $can_read AND $can_write) {
             // update the data
 
             if ($updateRecordMaterialID >= 0) {
+
+                $dataItemMaterial['property_stamp'] = isset($_POST['property_stamp']) ? 1 : NULL;
+                $dataItemMaterial['inventory_stamp'] = isset($_POST['inventory_stamp']) ? 2 : NULL;
+                $dataItemMaterial['barcode'] = isset($_POST['barcode']) ? 3 : NULL; 
+                $dataItemMaterial['book_pocket'] = isset($_POST['book_pocket']) ? 4 : NULL;
+                $dataItemMaterial['book_card'] = isset($_POST['book_card']) ? 5 : NULL;
+                $dataItemMaterial['catalog_card'] = isset($_POST['catalog_card']) ? 6 : NULL;
+                $dataItemMaterial['book_label'] = isset($_POST['book_label']) ? 7 : NULL;
+                $dataItemMaterial['date_due_slip'] = isset($_POST['date_due_slip']) ? 8 : NULL;
+
                 $updateItemMaterials = $sql_op->update('item_materials', $dataItemMaterial, "id=".$updateRecordMaterialID);
             }
             
@@ -170,14 +208,14 @@ if (isset($_POST['saveData']) AND $can_read AND $can_write) {
 
              $check_null_q = $dbs->query('SELECT * 
                                     FROM item_materials
-                                    WHERE property_stamp IS NULL 
-                                    AND inventory_stamp IS NULL 
-                                    AND barcode IS NULL
-                                    AND book_pocket IS NULL 
-                                    AND book_card IS NULL
-                                    AND catalog_card IS NULL 
-                                    AND book_label IS NULL
-                                        AND date_due_slip IS NULL 
+                                    WHERE property_stamp IS NULL OR property_stamp=0
+                                    AND inventory_stamp IS NULL OR inventory_stamp=0
+                                    AND barcode IS NULL OR barcode=0
+                                    AND book_pocket IS NULL OR book_pocket=0
+                                    AND book_card IS NULL OR book_card=0
+                                    AND catalog_card IS NULL OR catalog_card=0
+                                    AND book_label IS NULL OR book_label=0
+                                        AND date_due_slip IS NULL OR date_due_slip=0
                                         AND id='.$updateRecordMaterialID);
 
 
