@@ -208,15 +208,15 @@ if (isset($_POST['saveData']) AND $can_read AND $can_write) {
 
              $check_null_q = $dbs->query('SELECT * 
                                     FROM item_materials
-                                    WHERE property_stamp IS NULL OR property_stamp=0
-                                    AND inventory_stamp IS NULL OR inventory_stamp=0
-                                    AND barcode IS NULL OR barcode=0
-                                    AND book_pocket IS NULL OR book_pocket=0
-                                    AND book_card IS NULL OR book_card=0
-                                    AND catalog_card IS NULL OR catalog_card=0
-                                    AND book_label IS NULL OR book_label=0
-                                        AND date_due_slip IS NULL OR date_due_slip=0
-                                        AND id='.$updateRecordMaterialID);
+                                    WHERE (property_stamp IS NULL OR property_stamp=0)
+                                    AND (inventory_stamp IS NULL OR inventory_stamp=0)
+                                    AND (barcode IS NULL OR barcode=0)
+                                    AND (book_pocket IS NULL OR book_pocket=0)
+                                    AND (book_card IS NULL OR book_card=0)
+                                    AND (catalog_card IS NULL OR catalog_card=0)
+                                    AND (book_label IS NULL OR book_label=0)
+                                    AND (date_due_slip IS NULL OR date_due_slip=0)
+                                    AND id='.$updateRecordMaterialID);
 
 
 
@@ -224,19 +224,9 @@ if (isset($_POST['saveData']) AND $can_read AND $can_write) {
                  $dataIdItemMaterial['item_material_id'] = NULL;
                  $dbs->query('UPDATE item SET item_material_id = NULL WHERE item_id ='.$updateRecordID);
                  $sql_op->delete('item_materials', "id=$updateRecordMaterialID");
-                // $updateIdItemMaterial = $sql_op->update('item', $dataIdItemMaterial, "item_id=".$updateRecordID);
              }
 
-            // if ($updateRecordMaterialID == 0) {
-            //     $insertItemMaterials = $sql_op->insert('item_materials', $dataItemMaterial);
-            //     $dataItemMaterialId['item_material_id'] = $sql_op->insert_id;
-            //     //$update = $sql_op->update('item', $data, "item_id=".$updateRecordID);
-            //     $update = $sql_op->update('item', $dataItemMaterialId, "item_id=".$updateRecordID);
-            // }
-            // else{
-            //     $updateItemMaterials = $sql_op->update('item_materials', $dataItemMaterial, "id=".$updateRecordMaterialID);
-            //     $update = $sql_op->update('item', $data, "item_id=".$updateRecordID);
-            // }
+            
 
             if ($update || $updateItemMaterials) {
                 // write log
@@ -478,6 +468,8 @@ if (isset($_POST['detail']) OR (isset($_GET['action']) AND $_GET['action'] == 'd
     // $item_material->element_name= 'itemMaterial';
     $item_material_q = $dbs->query('SELECT property_stamp, inventory_stamp, barcode, book_pocket, book_card, catalog_card, book_label, date_due_slip FROM item_materials WHERE id='.(integer)$rec_d['item_material_id']);
     $item_material_d = $item_material_q->fetch_array();
+
+    var_dump($rec_d['item_material_id']);
     // $item_material_val = array(
     //                                  (integer)$item_material_d['property_stamp'], 
     //                                  (integer)$item_material_d['inventory_stamp'],
