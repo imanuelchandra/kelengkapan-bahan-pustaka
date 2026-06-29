@@ -469,7 +469,7 @@ if (isset($_POST['detail']) OR (isset($_GET['action']) AND $_GET['action'] == 'd
     $item_material_q = $dbs->query('SELECT property_stamp, inventory_stamp, barcode, book_pocket, book_card, catalog_card, book_label, date_due_slip FROM item_materials WHERE id='.(integer)$rec_d['item_material_id']);
     $item_material_d = $item_material_q->fetch_array();
 
-    var_dump($rec_d['item_material_id']);
+    //var_dump($rec_d['item_material_id']);
     // $item_material_val = array(
     //                                  (integer)$item_material_d['property_stamp'], 
     //                                  (integer)$item_material_d['inventory_stamp'],
