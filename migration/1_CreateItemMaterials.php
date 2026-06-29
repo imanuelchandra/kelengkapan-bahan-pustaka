@@ -9,14 +9,14 @@ class CreateItemMaterials extends Migration
     {
         Schema::create('item_materials', function(Blueprint $table) {
             $table->autoIncrement('id');
-            $table->tinynumber('property_stamp')->default(0);
-            $table->tinynumber('inventory_stamp')->default(0);
-            $table->tinynumber('barcode')->default(0);
-            $table->tinynumber('book_pocket')->default(0);
-            $table->tinynumber('book_card')->default(0);
-            $table->tinynumber('catalog_card')->default(0);
-            $table->tinynumber('book_label')->default(0);
-            $table->tinynumber('date_due_slip')->default(0);
+            $table->tinynumber('property_stamp')->nullable(); 
+            $table->tinynumber('inventory_stamp')->nullable(); 
+            $table->tinynumber('barcode')->nullable(); 
+            $table->tinynumber('book_pocket')->nullable(); 
+            $table->tinynumber('book_card')->nullable(); 
+            $table->tinynumber('catalog_card')->nullable(); 
+            $table->tinynumber('book_label')->nullable(); 
+            $table->tinynumber('date_due_slip')->nullable(); 
             $table->timestamps();
             $table->engine = 'MyISAM';
         });
@@ -25,6 +25,6 @@ class CreateItemMaterials extends Migration
 
     function down()
     {
-         //Schema::drop('item_materials');
+        Schema::drop('item_materials');
     }
 }

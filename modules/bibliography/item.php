@@ -72,7 +72,7 @@ if (isset($_POST['saveData']) AND $can_read AND $can_write) {
 
         //print_r($_POST['itemMaterial']);
 
-        $dataItemMaterial = array();
+        //$dataItemMaterial = array();
 
        
             
@@ -95,16 +95,6 @@ if (isset($_POST['saveData']) AND $can_read AND $can_write) {
                isset($_POST['book_label']) ||
                isset($_POST['date_due_slip'])
                 ){
-
-                // $dataItemMaterial['property_stamp'] = 1;
-                // $dataItemMaterial['inventory_stamp'] = 2;
-                // $dataItemMaterial['barcode'] = 3; 
-                // $dataItemMaterial['book_pocket'] = 4;
-                // $dataItemMaterial['book_card'] = 5;
-                // $dataItemMaterial['catalog_card'] = 6;
-                // $dataItemMaterial['book_label'] = 7;
-                // $dataItemMaterial['date_due_slip'] = 8;
-
 
                 $dataItemMaterial['property_stamp'] = isset($_POST['property_stamp']) ? 1 : NULL;
                 $dataItemMaterial['inventory_stamp'] = isset($_POST['inventory_stamp']) ? 2 : NULL;
@@ -145,19 +135,6 @@ if (isset($_POST['saveData']) AND $can_read AND $can_write) {
         $data['site'] = trim($dbs->escape_string(strip_tags($_POST['itemSite'])));
         $data['coll_type_id'] = intval($_POST['collTypeID']);
         $data['item_status_id'] = $dbs->escape_string($_POST['itemStatusID']);
-
-     
-
-        // if($_POST['updateRecordMaterialID'] <= 0){
-          
-        // } 
-
-        // if ($_POST['updateRecordConditionID'] <= 0) {
-            
-        // } 
-
-        //$data['physical_condition'] = trim($dbs->escape_string(strip_tags($_POST['physicalCondition'])));
-
         $data['source'] = $_POST['source'];
         $data['order_no'] = trim($dbs->escape_string(strip_tags($_POST['orderNo'])));
         $data['order_date'] = $_POST['ordDate'];
@@ -185,6 +162,16 @@ if (isset($_POST['saveData']) AND $can_read AND $can_write) {
             // update the data
 
             if ($updateRecordMaterialID >= 0) {
+               
+             if(isset($_POST['property_stamp']) || 
+               isset($_POST['inventory_stamp']) || 
+               isset($_POST['barcode']) || 
+               isset($_POST['book_pocket']) || 
+               isset($_POST['book_card']) || 
+               isset($_POST['catalog_card']) || 
+               isset($_POST['book_label']) ||
+               isset($_POST['date_due_slip'])
+                ){
 
                 $dataItemMaterial['property_stamp'] = isset($_POST['property_stamp']) ? 1 : NULL;
                 $dataItemMaterial['inventory_stamp'] = isset($_POST['inventory_stamp']) ? 2 : NULL;
@@ -196,6 +183,8 @@ if (isset($_POST['saveData']) AND $can_read AND $can_write) {
                 $dataItemMaterial['date_due_slip'] = isset($_POST['date_due_slip']) ? 8 : NULL;
 
                 $updateItemMaterials = $sql_op->update('item_materials', $dataItemMaterial, "id=".$updateRecordMaterialID);
+
+                } 
             }
             
             if ($updateRecordConditionID >= 0) { 
@@ -464,37 +453,9 @@ if (isset($_POST['detail']) OR (isset($_GET['action']) AND $_GET['action'] == 'd
         }
     $form->addSelectList('itemStatusID', __('Item Status'), $item_status_options, $rec_d['item_status_id']??'','style="width:40%" class="form-control"');
 
-    // $item_material = new simbio_fe_checkbox();
-    // $item_material->element_name= 'itemMaterial';
     $item_material_q = $dbs->query('SELECT property_stamp, inventory_stamp, barcode, book_pocket, book_card, catalog_card, book_label, date_due_slip FROM item_materials WHERE id='.(integer)$rec_d['item_material_id']);
     $item_material_d = $item_material_q->fetch_array();
 
-    //var_dump($rec_d['item_material_id']);
-    // $item_material_val = array(
-    //                                  (integer)$item_material_d['property_stamp'], 
-    //                                  (integer)$item_material_d['inventory_stamp'],
-    //                                  (integer)$item_material_d['barcode'],
-    //                                  (integer)$item_material_d['book_pocket'],
-    //                                  (integer)$item_material_d['book_card'],
-    //                                  (integer)$item_material_d['catalog_card'],
-    //                                  (integer)$item_material_d['book_label'],
-    //                                  (integer)$item_material_d['date_due_slip']
-    //                                  );
-    //    //print_r($item_material_val);
-    
-    // $item_material->element_value= $item_material_val;
-    // $item_material->element_helptext= "Kelengkapan Bahan Pustaka.)";
-    // $item_material->element_options = array (
-    //                                     array(1, "Property Stamp"),
-    //                                     array(2, "Inventory Stamp"),
-    //                                     array(3, "Barcode"),
-    //                                     array(4, "Book Pocket"),
-    //                                     array(5, "Book Card"),
-    //                                     array(6, "Catalog Card"),
-    //                                     array(7, "Book Label"),
-    //                                     array(8, "Date Due Slip"),
-    //                                     );
-    // $str_input_item_material = $item_material->out();
     $str_input_item_material .='<div class="form-check">
         <input class="form-check-input" type="checkbox" name="property_stamp" value="'.((integer)$item_material_d['property_stamp'] == 1 ? 1 : 0).'" id="property_stamp" '.((integer)$item_material_d['property_stamp'] == 1 ? "checked" : "") .'>
         <label class="form-check-label" for="flexCheckDefault">Property Stamp</label>
