@@ -11,14 +11,10 @@ use SLiMS\Plugins;
 
 $plugin = Plugins::getInstance();
 
-Plugins::getInstance()->registerAutoload(__DIR__);
-
 
 $pathKelengkapanBahanPustaka = __DIR__ . '/pages/kelengkapan_bahan_pustaka.php';
 $pathRekapitulasiKelengkapanBahanPustaka = __DIR__ . '/pages/rekapitulasi_kelengkapan_bahan_pustaka.php';
 $pathStatistikKelengkapanBahanPustaka = __DIR__ . '/pages/statistik_kelengkapan_bahan_pustaka.php';
-//$path =  __DIR__ . '/pages/inventarisasi.php';
- // Make default group menu
 
 Plugins::group('Kelengkapan Bahan Pustaka', function() use($pathKelengkapanBahanPustaka, $pathRekapitulasiKelengkapanBahanPustaka) {
             // Scan all file inside module directory as menu

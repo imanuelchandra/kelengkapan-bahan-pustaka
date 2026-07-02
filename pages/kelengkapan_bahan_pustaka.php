@@ -20,27 +20,6 @@
  *
  */
 
-/* Item List */
-
-// key to authenticate
-// define('INDEX_AUTH', '1');
-
-// // main system configuration
-
-// // IP based access limitation
-// require LIB . 'ip_based_access.inc.php';
-// do_checkIP('smc');
-// do_checkIP('smc-reporting');
-// // start the session
-// require SB . 'admin/default/session.inc.php';
-// require SB . 'admin/default/session_check.inc.php';
-// // privileges checking
-// $can_read = utility::havePrivilege('reporting', 'r');
-// $can_write = utility::havePrivilege('reporting', 'w');
-
-// if (!$can_read) {
-//     die('<div class="errorBox">' . __('You don\'t have enough privileges to access this area!') . '</div>');
-// }
 defined('INDEX_AUTH') OR die('Direct access not allowed!');
 
 //require '../../../sysconfig.inc.php';
@@ -63,18 +42,6 @@ require SIMBIO . 'simbio_GUI/paging/simbio_paging.inc.php';
 require SIMBIO . 'simbio_GUI/form_maker/simbio_form_element.inc.php';
 require SIMBIO . 'simbio_DB/datagrid/simbio_dbgrid.inc.php';
 require MDLBS . 'reporting/report_dbgrid.inc.php';
-
-// function httpQuery($query = [])
-// {
-//     return http_build_query(array_unique(array_merge($_GET, $query)));
-// }
-
-// $page_title = 'Items/Copies Report';
-// $reportView = false;
-// $num_recs_show = 20;
-// if (isset($_GET['reportView'])) {
-//     $reportView = true;
-// }
 
 function httpQuery($query = [])
 {
@@ -169,21 +136,7 @@ if (!$reportView) {
                 <?php
                     $item_material = new simbio_fe_checkbox();
                     $item_material->element_name= 'itemMaterial';
-                    $item_material_q = $dbs->query('SELECT property_stamp, inventory_stamp, barcode, book_pocket, book_card, catalog_card, book_label, date_due_slip FROM item_materials WHERE id='.(integer)$rec_d['item_material_id']);
-                    $item_material_d = $item_material_q->fetch_array();
-                    $item_material_val = array(
-                                                    (integer)$item_material_d['property_stamp'], 
-                                                    (integer)$item_material_d['inventory_stamp'],
-                                                    (integer)$item_material_d['barcode'],
-                                                    (integer)$item_material_d['book_pocket'],
-                                                    (integer)$item_material_d['book_card'],
-                                                    (integer)$item_material_d['catalog_card'],
-                                                    (integer)$item_material_d['book_label'],
-                                                    (integer)$item_material_d['date_due_slip']
-                                                    );
-                    //print_r($item_material_val);
                     
-                    $item_material->element_value= $item_material_val;
                     $item_material->element_helptext= "Kelengkapan Bahan Pustaka.)";
                     $item_material->element_options = array (
                                                         array(1, "Property Stamp"),
@@ -196,7 +149,7 @@ if (!$reportView) {
                                                         array(8, "Date Due Slip"),
                                                         );
                     echo $item_material->out();
-                    // $form->addAnything(__('Item Materials Checklist'), $str_input_item_material);
+                   
               
                 ?>
                 </div>
@@ -230,7 +183,6 @@ if (!$reportView) {
 <?php
 } else {
     ob_start();
-
 
        $table_spec = 'item AS i
                    LEFT JOIN search_biblio AS b ON i.biblio_id=b.biblio_id
@@ -272,8 +224,7 @@ if (!$reportView) {
 
     // is there any search
     $criteria = 'b.biblio_id IS NOT NULL AND i.item_material_id IS NOT NULL';
-    //$criteria = '(b.biblio_id IS NOT NULL AND imat.property_stamp IS NOT NULL AND imat.property_stamp != \'\') AND (b.biblio_id IS NOT NULL AND imat.barcode IS NOT NULL AND imat.barcode != \'\') ';
-    //$criteria .= 'AND ba.author_id IN (SELECT DISTINCT author_id FROM mst_author) AND ba.biblio_id=i.biblio_id';
+    
     if (isset($_GET['judul']) and !empty($_GET['judul'])) {
         $keyword = $dbs->escape_string(trim($_GET['judul']));
         $words = explode(' ', $keyword);

@@ -101,7 +101,8 @@ if (!$reportView) {
 	$xls_cc = 0;
     $row_class = 'alterCellPrinted';
 
-     
+    $criteria = 'id IS NOT NULL';
+
     if (isset($_GET['tglMulaiKelengkapan']) AND !empty($_GET['tglMulaiKelengkapan']) && isset($_GET['tglSelesaiKelengkapan']) AND !empty($_GET['tglSelesaiKelengkapan'])) {
         $kelengkapanDateStart = $dbs->escape_string(trim($_GET['tglMulaiKelengkapan']));
         $kelengkapanDateEnd = $dbs->escape_string(trim($_GET['tglSelesaiKelengkapan']));
@@ -130,7 +131,6 @@ if (!$reportView) {
                                 SUM(CASE WHEN date_due_slip = 8 THEN 1 ELSE 0 END) AS eks_datedueslip
                                 FROM item_materials 
                                 WHERE 
-                                id IS NOT NULL
                                 $criteria;
                                 ");
 
@@ -249,7 +249,7 @@ if (!$reportView) {
                                 SUM(CASE WHEN book_label = 7 THEN 1 ELSE 0 END) AS blabel, 
                                 SUM(CASE WHEN date_due_slip = 8 THEN 1 ELSE 0 END) AS ddslip 
                             FROM item_materials
-                            WHERE id IS NOT NULL $criteria) AS sub
+                            WHERE $criteria) AS sub
                                 ");
    $total_d = $total_q->fetch_row();
    $output .=  '<th>'.$total_d[0].'</th>';
@@ -266,7 +266,7 @@ if (!$reportView) {
    $total_q = $dbs->query("
                             SELECT COUNT(id) AS total
                             FROM item_materials
-                            WHERE id IS NOT NULL $criteria
+                            WHERE $criteria
                             ");
    $total_d = $total_q->fetch_row();
    $output .=  '<th>'.$total_d[0].'</th>';
